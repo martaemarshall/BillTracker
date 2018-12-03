@@ -14,30 +14,189 @@ block content
       ul
         li.form-group(style='display:inline')
           label.control-label.requiredField(style='font-size:18px' for='viewList') View By:
-              select#viewList.select.form-control.input-lg(form='viewList', name='viewList')
+              select#viewList.select.form-control.input-lg(form='viewList', name='viewList' onChange="doReload(this.value);")
                 option(value='all', selected= all) All
+                option(value='date', selected= overdue) Date
                 option(value='paid', selected= paid) Paid
                 option(value='future', selected= future) Future
                 option(value='overdue', selected= overdue) Overdue
         a.btn.btn-primary(href='./bills/new' style='margin-left: 25px;display:inline') Add Bill
+        a.btn.btn-primary(onclick='something()' style='margin-left: 25px;display:inline') Sort By Date
 
-  each bill in bills
-    section(style='background:#D4F4F6;border-bottom: solid;width:100%;height:250px')
-      a(style='display:block;width:100%;font-size:40px;text-align:center' href='/bills/' + bill.id)= bill.company
-      p(style='width:100%;font-size:20px;text-align:center' href='/bills/' + bill.id)= "Bill Type: " + bill.type
-      ul(style='display:flex; justify-content: space-between; list-style-type:none; text-align:center;text-decoration:underline')
-        li(style='font-weight:bold;display:inline;')= "Due Date"
-        li(style='font-weight:bold;display:inline;margin-left:-1.5%')= "Amount Due"
-        li(style='font-weight:bold;display: inline;margin-right:7%')= "Status"
+        script.
 
-      ul(style='display:flex; justify-content: space-between; list-style-type:none; text-align:center')
-        li(style='font-weight:bold;display:inline')= bill.dueDate.toLocaleDateString("en-US")
-        li(style='font-weight:bold;display:inline;')="$" + bill.amtDue
-        if bill.paidStatus == 'paid'
-          li.a.btn.btn-primary( style='background:green;margin-right:5.75%;padding:15px') paid
-        else if  bill.paidStatus == 'unpaid' && bill.dueDate < Date.now()
-          li.a.btn.btn-primary( style='background:red;margin-right:5.75%;padding:15px') overdue
-        else
-          li.a.btn.btn-primary( style='background:red;margin-right:5.75%;padding:15px') pay
+          var data = JSON.parse('!{JSON.stringify(bills)}');
+          var doReload = function(selectedvalue) {
+          console.log(selectedvalue)
 
-  
+          if (selectedvalue === "all"){
+            document.getElementById('billlist').innerHTML = "";
+
+            for (var i=0; i<data.length; i++) {
+            var date = new Date(data[i].dueDate);
+              var doc = document.getElementById('billlist');
+              doc.innerHTML += '<section id="billsection" style="background:#D4F4F6;border-bottom: solid;width:100%;height:250px"></section>';
+
+              var billsec = document.getElementById('billsection');
+              billsec.innerHTML += "<a style='display:block;width:100%;font-size:40px;text-align:center' href='/bills/"+data[i]._id+"'>" + data[i].company + " </a>";
+              billsec.innerHTML += "<p style='width:100%;font-size:20px;text-align:center'> Bill Type: " + data[i].type + " </p>" ;
+              billsec.innerHTML += "<ul id='billhead' style='display:flex; justify-content: space-between; list-style-type:none; text-align:center;text-decoration:underline'>";
+
+              var billheader = document.getElementById('billhead');
+              billheader.innerHTML += "<li style='font-weight:bold;display:inline;'> Due Date </li>";
+              billheader.innerHTML += "<li style='font-weight:bold;display:inline;margin-left:-1.5%'> Amount Due </li>";
+              billheader.innerHTML += "<li style='font-weight:bold;display: inline;margin-right:7%'> Status </li>";
+
+              billsec.innerHTML += "<ul id='billdetails'style='display:flex; justify-content: space-between; list-style-type:none; text-align:center'>";
+              var billdets = document.getElementById('billdetails');
+              billdets.innerHTML += "<li style='font-weight:bold;display:inline'> " + date.toLocaleDateString("en-US") + " </li>";
+              billdets.innerHTML += "<li style='font-weight:bold;display:inline;'> $" + data[i].amtDue + " </li>";
+              if (data[i].paidStatus == 'paid')
+                billdets.innerHTML += "<a href='/bills/"+data[i]._id+"' style='background:green;margin-right:5.75%;padding:15px'> paid </a>";
+              else if  (data[i].paidStatus == 'unpaid' && data[i].dueDate < Date.now())
+                billdets.innerHTML += "<a href='/bills/"+data[i]._id+"' style='background:black;margin-right:5.75%;padding:15px'> overdue </a>";
+              else
+                billdets.innerHTML += "<a href='/bills/"+data[i]._id+"' style='background:red;margin-right:5.75%;padding:15px'> pay </a>";
+              }
+            }
+
+
+          else if (selectedvalue === "date"){
+            data.sort(function(a, b){return new Date(a.dueDate) - new Date(b.dueDate);})
+            document.getElementById('billlist').innerHTML = "";
+
+            for (var i=0; i<data.length; i++) {
+            var date = new Date(data[i].dueDate);
+              var doc = document.getElementById('billlist');
+              doc.innerHTML += '<section id="billsection" style="background:#D4F4F6;border-bottom: solid;width:100%;height:250px"></section>';
+
+              var billsec = document.getElementById('billsection');
+              billsec.innerHTML += "<a style='display:block;width:100%;font-size:40px;text-align:center' href='/bills/"+data[i]._id+"'>" + data[i].company + " </a>";
+              billsec.innerHTML += "<p style='width:100%;font-size:20px;text-align:center'> Bill Type: " + data[i].type + " </p>" ;
+              billsec.innerHTML += "<ul id='billhead' style='display:flex; justify-content: space-between; list-style-type:none; text-align:center;text-decoration:underline'>";
+
+              var billheader = document.getElementById('billhead');
+              billheader.innerHTML += "<li style='font-weight:bold;display:inline;'> Due Date </li>";
+              billheader.innerHTML += "<li style='font-weight:bold;display:inline;margin-left:-1.5%'> Amount Due </li>";
+              billheader.innerHTML += "<li style='font-weight:bold;display: inline;margin-right:7%'> Status </li>";
+
+              billsec.innerHTML += "<ul id='billdetails'style='display:flex; justify-content: space-between; list-style-type:none; text-align:center'>";
+              var billdets = document.getElementById('billdetails');
+              billdets.innerHTML += "<li style='font-weight:bold;display:inline'> " + date.toLocaleDateString("en-US") + " </li>";
+              billdets.innerHTML += "<li style='font-weight:bold;display:inline;'> $" + data[i].amtDue + " </li>";
+              if (data[i].paidStatus == 'paid')
+                billdets.innerHTML += "<a href='/bills/"+data[i]._id+"' style='background:green;margin-right:5.75%;padding:15px'> paid </a>";
+              else if  (data[i].paidStatus == 'unpaid' && data[i].dueDate < Date.now())
+                billdets.innerHTML += "<a href='/bills/"+data[i]._id+"' style='background:black;margin-right:5.75%;padding:15px'> overdue </a>";
+              else
+                billdets.innerHTML += "<a href='/bills/"+data[i]._id+"' style='background:red;margin-right:5.75%;padding:15px'> pay </a>";
+              }
+            }
+
+            else if (selectedvalue === "overdue"){
+              document.getElementById('billlist').innerHTML = "";
+              for (var i=0; i<data.length; i++) {
+                var date = new Date(data[i].dueDate);
+
+                if (data[i].paidStatus === 'unpaid' && date < Date.now()){
+                  var doc = document.getElementById('billlist');
+                  doc.innerHTML += '<section id="billsection" style="background:red;border-bottom:solid;width:100%;height:250px"></section>';
+
+                  var billsec = document.getElementById('billsection');
+                  billsec.innerHTML += "<a style='display:block;width:100%;font-size:40px;text-align:center' href='/bills/"+data[i]._id+"'>" + data[i].company + " </a>";
+                  billsec.innerHTML += "<p style='width:100%;font-size:20px;text-align:center'> Bill Type: " + data[i].type + " </p>" ;
+                  billsec.innerHTML += "<ul id='billhead' style='display:flex; justify-content: space-between; list-style-type:none; text-align:center;text-decoration:underline'>";
+
+                  var billheader = document.getElementById('billhead');
+                  billheader.innerHTML += "<li style='font-weight:bold;display:inline;'> Due Date </li>";
+                  billheader.innerHTML += "<li style='font-weight:bold;display:inline;margin-left:-1.5%'> Amount Due </li>";
+                  billheader.innerHTML += "<li style='font-weight:bold;display: inline;margin-right:7%'> Status </li>";
+
+                  billsec.innerHTML += "<ul id='billdetails'style='display:flex; justify-content: space-between; list-style-type:none; text-align:center'>";
+                  var billdets = document.getElementById('billdetails');
+                  billdets.innerHTML += "<li style='font-weight:bold;display:inline'> " + date.toLocaleDateString("en-US") + " </li>";
+                  billdets.innerHTML += "<li style='font-weight:bold;display:inline;'> $" + data[i].amtDue + " </li>";
+                  billdets.innerHTML += "<a href='/bills/"+data[i]._id+"' style='background:black;margin-right:5.75%;padding:15px'> overdue </a>";
+                  }
+
+                }
+              }
+
+
+              else if (selectedvalue === "paid"){
+                document.getElementById('billlist').innerHTML = "";
+
+                for (var i=0; i<data.length; i++) {
+                var date = new Date(data[i].dueDate);
+                  var doc = document.getElementById('billlist');
+                  if (data[i].paidStatus === 'paid'){
+                    doc.innerHTML += '<section id="billsection" style="background:#D4F4F6;border-bottom: solid;width:100%;height:250px"></section>';
+
+                    var billsec = document.getElementById('billsection');
+                    billsec.innerHTML += "<a style='display:block;width:100%;font-size:40px;text-align:center' href='/bills/"+data[i]._id+"'>" + data[i].company + " </a>";
+                    billsec.innerHTML += "<p style='width:100%;font-size:20px;text-align:center'> Bill Type: " + data[i].type + " </p>" ;
+                    billsec.innerHTML += "<ul id='billhead' style='display:flex; justify-content: space-between; list-style-type:none; text-align:center;text-decoration:underline'>";
+
+                    var billheader = document.getElementById('billhead');
+                    billheader.innerHTML += "<li style='font-weight:bold;display:inline;'> Due Date </li>";
+                    billheader.innerHTML += "<li style='font-weight:bold;display:inline;margin-left:-1.5%'> Amount Due </li>";
+                    billheader.innerHTML += "<li style='font-weight:bold;display: inline;margin-right:7%'> Status </li>";
+
+                    billsec.innerHTML += "<ul id='billdetails'style='display:flex; justify-content: space-between; list-style-type:none; text-align:center'>";
+                    var billdets = document.getElementById('billdetails');
+                    billdets.innerHTML += "<li style='font-weight:bold;display:inline'> " + date.toLocaleDateString("en-US") + " </li>";
+                    billdets.innerHTML += "<li style='font-weight:bold;display:inline;'> $" + data[i].amtDue + " </li>";
+                    billdets.innerHTML += "<a href='/bills/"+data[i]._id+"' style='background:green;margin-right:5.75%;padding:15px'> paid </a>";
+                  }
+                }
+              }
+
+              console.log(data)
+          }
+
+
+        script.
+          var something = function() {
+          bills.sort(function(a, b){return a.dueDate - b.dueDate;})
+          }
+
+
+  div#billlist
+    each bill in bills
+      if bill.paidStatus == 'unpaid' && bill.dueDate < Date.now()
+        section(style='background:red;border-bottom: solid;width:100%;height:250px')
+          a(style='display:block;width:100%;font-size:40px;text-align:center' href='/bills/' + bill.id)= bill.company
+          p(style='width:100%;font-size:20px;text-align:center' href='/bills/' + bill.id)= "Bill Type: " + bill.type
+          ul(style='display:flex; justify-content: space-between; list-style-type:none; text-align:center;text-decoration:underline')
+            li(style='font-weight:bold;display:inline;')= "Due Date"
+            li(style='font-weight:bold;display:inline;margin-left:-1.5%')= "Amount Due"
+            li(style='font-weight:bold;display: inline;margin-right:7%')= "Status"
+
+          ul(style='display:flex; justify-content: space-between; list-style-type:none; text-align:center')
+            li(style='font-weight:bold;display:inline')= bill.dueDate.toLocaleDateString("en-US")
+            li(style='font-weight:bold;display:inline;')="$" + bill.amtDue
+            if bill.paidStatus == 'paid'
+              a.btn.btn-primary(href='/bills/' + bill.id style='background:green;margin-right:5.75%;padding:15px') paid
+            else if  bill.paidStatus == 'unpaid' && bill.dueDate < Date.now()
+              a.btn.btn-primary(href='/bills/' + bill.id style='background:black;margin-right:5.75%;padding:15px') overdue
+            else
+              a.btn.btn-primary(href='/bills/' + bill.id style='background:red;margin-right:5.75%;padding:15px') pay
+
+      else
+        section(style='background:#D4F4F6;border-bottom: solid;width:100%;height:250px')
+          a(style='display:block;width:100%;font-size:40px;text-align:center' href='/bills/' + bill.id)= bill.company
+          p(style='width:100%;font-size:20px;text-align:center' href='/bills/' + bill.id)= "Bill Type: " + bill.type
+          ul(style='display:flex; justify-content: space-between; list-style-type:none; text-align:center;text-decoration:underline')
+            li(style='font-weight:bold;display:inline;')= "Due Date"
+            li(style='font-weight:bold;display:inline;margin-left:-1.5%')= "Amount Due"
+            li(style='font-weight:bold;display: inline;margin-right:7%')= "Status"
+
+          ul(style='display:flex; justify-content: space-between; list-style-type:none; text-align:center')
+            li(style='font-weight:bold;display:inline')= bill.dueDate.toLocaleDateString("en-US")
+            li(style='font-weight:bold;display:inline;')="$" + bill.amtDue
+            if bill.paidStatus == 'paid'
+              a.btn.btn-primary(href='/bills/' + bill.id style='background:green;margin-right:5.75%;padding:15px') paid
+            else if  bill.paidStatus == 'unpaid' && bill.dueDate < Date.now()
+              a.btn.btn-primary(href='/bills/' + bill.id style='background:red;margin-right:5.75%;padding:15px') overdue
+            else
+              a.btn.btn-primary(href='/bills/' + bill.id style='background:red;margin-right:5.75%;padding:15px') pay
