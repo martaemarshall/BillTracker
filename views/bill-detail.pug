@@ -1,8 +1,16 @@
 extends layout.pug
 
 block content
-  h1.mt-5= bill.type
-    a.btn.btn-primary(href='/bills/' + bill.id + '/update' style='margin-left: 25px') Update
-    form(action='/bills/' + bill.id + '/delete' method="POST")
-      button.btn.btn-danger(type='submit') Delete
-  h6.mt-5= "The " + bill.type + " bill due " + bill.dueDate + " issued from " + bill.company +  " with a due amount of $" + bill.amtDue + " is " + bill.paidStatus + "." 
+  section(style='display=inline')
+    h1.mt-5= bill.type
+      a.btn.btn-primary(href='/bills/' + bill.id + '/update' style='margin-left: 25px') Update
+      form(action='/bills/' + bill.id + '/delete' method="POST")
+        button.btn.btn-danger(type='submit') Delete
+  h6.mt-5= "The " + bill.type + " bill due " + bill.dueDate + " issued from " + bill.company +  " with a due amount of $" + bill.amtDue + " is " + bill.paidStatus + "."
+  if bill.paidStatus == 'unpaid'
+    input(type='button', class='btn btn-primary', value='Pay Bill', onclick="payBill()")
+    script.
+      function payBill(){
+        bill.paidStatus='paid';
+        alert('Bill has been paid!');
+      }
