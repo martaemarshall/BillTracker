@@ -13,11 +13,11 @@ describe('Bills', function() {
     it('should get the specified bill', function(done) {
       let expectedBill = new Bill({
         type: "Test Type",
-        dueDate: "2018-12-3",
+        dueDate: "12/3/2018",
         company: "Test Company",
         amtDue: "100",
         paidStatus: "Test Status"
-      })
+      });
 
       expectedBill.save(function(err, savedBill) {
         chai.request(server)
