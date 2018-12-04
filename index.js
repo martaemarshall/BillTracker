@@ -26,41 +26,41 @@ var bill = mongoose.model('bill', billSchema);
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() 
+db.once('open', function()
 {
-    app.get('/', (req, res) => 
+    app.get('/', (req, res) =>
     {
-        bill.find({}, function(err, bills) 
+        bill.find({}, function(err, bills)
         {
-          if (err) 
+          if (err)
           {
             console.log(err)
             res.render('error', {})
-          } 
-          else 
+          }
+          else
           {
             res.render('index', { bills: bills })
           }
         });
       });
-    
-      app.get('/bills/new', (req, res) => 
+
+      app.get('/bills/new', (req, res) =>
       {
         res.render('bill-form', { title: "New bill", bill: {} })
       });
 
-    app.get('/bills/:id/update', (req, res) => 
+    app.get('/bills/:id/update', (req, res) =>
     {
         let id = ObjectID.createFromHexString(req.params.id)
-    
-        bill.findById(id, function(err, bill) 
+
+        bill.findById(id, function(err, bill)
         {
-          if (err) 
+          if (err)
           {
             console.log(err)
             res.render('error', {})
-          } 
-          else 
+          }
+          else
           {
             if (bill === null) {
               res.render('error', { message: "Not found" })
@@ -75,35 +75,35 @@ db.once('open', function()
         let newbill = new bill(req.body);
         newbill.save(function(err, savedbill)
         {
-          if (err) 
+          if (err)
           {
             console.log(err)
             res.render('bill-form', { bill: newbill, error: err })
-          } 
-          else 
+          }
+          else
           {
             res.redirect('/bills/' + savedbill.id);
           }
         });
     });
-    app.get('/bills/:id', (req, res) => 
+    app.get('/bills/:id', (req, res) =>
     {
         let id = ObjectID.createFromHexString(req.params.id)
-    
-        bill.findById(id, function(err, bill) 
+
+        bill.findById(id, function(err, bill)
         {
           if (err)
           {
             console.log(err)
             res.render('error', {})
-          } 
-          else 
+          }
+          else
           {
-            if (bill === null) 
+            if (bill === null)
             {
               res.render('error', { message: "Not found" })
-            } 
-            else 
+            }
+            else
             {
               res.render('bill-detail', { bill: bill})
             }
@@ -111,7 +111,7 @@ db.once('open', function()
         });
     });
 
-    app.post('/bills/:id/update', (req, res, next) => 
+    app.post('/bills/:id/update', (req, res, next) =>
     {
         let id = ObjectID.createFromHexString(req.params.id)
         bill.updateOne({"_id": id}, { $set: req.body }, function(err, details)
@@ -128,7 +128,24 @@ db.once('open', function()
         });
     });
 
-    app.post('/bills/:id/delete', (req, res) => 
+    app.post('/bills/:id/pay', (req, res, next) =>
+    {
+        let id = ObjectID.createFromHexString(req.params.id)
+        bill.updateOne({"_id": id}, { $set: { "paidStatus": "paid" } }, function(err, details)
+        {
+            if(err)
+            {
+                console.log(err)
+                res.render('error', {})
+            }
+            else
+            {
+                res.redirect('/bills/' + id)
+            }
+        });
+    });
+
+    app.post('/bills/:id/delete', (req, res) =>
     {
         let id = ObjectID.createFromHexString(req.params.id)
         bill.deleteOne({_id: id}, function(err, product)
@@ -137,25 +154,25 @@ db.once('open', function()
         });
     });
 
-    app.post('/api/bills', (req, res) => 
+    app.post('/api/bills', (req, res) =>
     {
         let newbill = new bill(req.body)
 
-        newbill.save(function (err, savedbill) 
+        newbill.save(function (err, savedbill)
         {
-            if (err) 
+            if (err)
             {
                 console.log(err)
                 res.status(500).send("There was an internal error")
             }
-            else 
+            else
             {
                 res.send(savedbill)
             }
         });
     });
 
-    app.post('/api/bills', (req, res) => 
+    app.post('/api/bills', (req, res) =>
     {
         bill.find({}, function(err, bills)
         {
@@ -171,7 +188,7 @@ db.once('open', function()
         });
     });
 
-    app.get('/api/bills', (req, res) => 
+    app.get('/api/bills', (req, res) =>
     {
         bill.find({}, function(err, bills)
         {
@@ -187,24 +204,24 @@ db.once('open', function()
         });
     });
 
-    app.get('/api/bills/:id', (req, res) => 
+    app.get('/api/bills/:id', (req, res) =>
     {
         let id = ObjectID.createFromHexString(req.params.id)
-    
-        bill.findById(id, function(err, bill) 
+
+        bill.findById(id, function(err, bill)
         {
-            if (err) 
+            if (err)
             {
                 console.log(err)
                 res.status(500).send("Internal server error")
             }
             else
             {
-                if (bill === null) 
+                if (bill === null)
                 {
                     res.status(404).send("Not found")
-                } 
-                else 
+                }
+                else
                 {
                     res.send(bill)
                 }
@@ -212,36 +229,36 @@ db.once('open', function()
         });
       });
 
-    app.put('/api/bills/:id', (req, res) => 
+    app.put('/api/bills/:id', (req, res) =>
     {
         let id = ObjectID.createFromHexString(req.params.id)
-    
-        bill.updateOne({"_id": id}, { $set: req.body }, function(err, details) 
+
+        bill.updateOne({"_id": id}, { $set: req.body }, function(err, details)
         {
-            if (err) 
+            if (err)
             {
                 console.log(err)
                 res.status(500).send("Internal server error")
-            } 
-            else 
+            }
+            else
             {
                 res.status(204).send()
             }
         });
       });
 
-    app.delete('/api/bills/:id', (req, res) => 
+    app.delete('/api/bills/:id', (req, res) =>
     {
         let id = ObjectID.createFromHexString(req.params.id)
-    
-        Review.deleteOne({"_id": id}, function(err) 
+
+        Review.deleteOne({"_id": id}, function(err)
         {
-          if (err) 
+          if (err)
           {
             console.log(err)
             res.status(500).send("Internal server error")
-          } 
-          else 
+          }
+          else
           {
             res.status(204).send()
           }
