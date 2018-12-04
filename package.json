@@ -24,13 +24,13 @@
     "express": "^4.16.4",
     "moment": "^2.22.2",
     "mongodb": "^3.1.10",
-    "mongoose": "^5.3.12",
+    "mongoose": "^5.3.14",
     "morgan": "^1.7.0",
     "pug": "^2.0.3"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "chai-http": "^2.0.1",
-    "mocha": "^2.4.5"
+    "chai": "^4.2.0",
+    "chai-http": "^4.2.0",
+    "mocha": "^5.2.0"
   }
 }
