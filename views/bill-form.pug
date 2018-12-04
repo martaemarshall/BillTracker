@@ -5,16 +5,16 @@ block content
   form(method="POST")
     .form-group
       label(for='type') Bill Type
-      input#type.form-control(type='text', placeholder='Enter Bill Type (gas, water, electric, etc.)', name="type", value=bill.type)
+      input#type.form-control(type='text', placeholder='Enter Bill Type (gas, water, electric, etc.)', name="type", value=bill.type, required)
     .form-group
       label(for='dueDate') Due Date
-      input#dueDate.form-control(type='date', placeholder='Enter Due Date', name="dueDate", value=bill.dueDate)
+      input#dueDate.form-control(type='date', placeholder='Enter Due Date', name="dueDate", value=bill.dueDate, required)
     .form-group
       label(for='company') Bill Company
-      textarea#company.form-control(type='text', placeholder='Enter the Bill Company', name="company", value=bill.company)
+      textarea#company.form-control(type='text', placeholder='Enter the Bill Company', name="company", value=bill.company, required)
     .form-group
       label(for='amtDue') Amount Due
-      textarea#amtDue.form-control(type='number', placeholder='Enter Bill Amount Due (in dollars)', name="amtDue", value=bill.amtDue)
+      textarea#amtDue.form-control(type='number', placeholder='Enter Bill Amount Due (in dollars)', name="amtDue", value=bill.amtDue, required)
     .form-group
       label(for='billStatus') Has the Bill been paid?
       |

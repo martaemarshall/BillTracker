@@ -252,3 +252,5 @@ db.once('open', function()
 
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+module.exports.app = app;
+module.exports.schema = bill;
